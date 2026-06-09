@@ -31,7 +31,7 @@ public:
     void setScore(int new_s) { score = new_s; }
 
     string str_to_file()const {
-        return "# " + to_string(id) + " | " + name + " | " + to_string(score);
+        return  to_string(id) + "|" + name + "|" + to_string(score);
     }
     
     static Student st_from_file(const string& line) {
