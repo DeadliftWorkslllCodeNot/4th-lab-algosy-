@@ -1,5 +1,5 @@
 #include <iostream>
-#include <unordered_map>
+#include <map>
 #include <string>
 #include <memory>
 #include <fstream>  
@@ -26,12 +26,12 @@ public:
     }
 
     void info() const {
-        cout << id << " | " << name << " " << score << endl;
+        cout << id << " | " << name << " " << score << endl;;
     }
     void setScore(int new_s) { score = new_s; }
 
-    string str_to_file() const {
-        return to_string(id) + "|" + name + "|" + to_string(score);
+    string str_to_file()const {
+        return "# " + to_string(id) + " | " + name + " | " + to_string(score);
     }
     
     static Student st_from_file(const string& line) {
@@ -51,11 +51,11 @@ public:
 
 class Journal {
 private:
-    unordered_map<int, shared_ptr<Student>> StId;
-    unordered_map<string, shared_ptr<Student>> StName;
+    map<int, shared_ptr<Student>> StId;
+    map <string, shared_ptr<Student>> StName;
     int next;
 public:
-    Journal() : next(1) {}
+    Journal() :next(1) {}
 
     bool add_St(const string& name, int score) {
         if (StName.find(name) != StName.end()) {
@@ -75,7 +75,7 @@ public:
     bool change_score_byName(const string& name, int new_s) {
         auto curr_st = StName.find(name);
         if (curr_st == StName.end()) {
-            cout << "Student " << name << " not found" << endl;
+            cout << "Student " << name << " not foud" << endl;
             return false;
         }
         curr_st->second->setScore(new_s);
@@ -90,7 +90,7 @@ public:
             return false;
         }
         curr_st->second->setScore(new_s);
-        cout << "Student`s (with id: " << ID << ") score was changed to " << new_s << endl;
+        cout << "Student`s (with id: " << ID << ") score was change to " << new_s << endl;
         return true;
     }
 
@@ -117,7 +117,7 @@ public:
             cout << "Journal is empty" << endl;
             return;
         }
-        cout << endl << "====Journal====" << endl;
+        cout << endl<< "====Journal====" << endl;
         for (const auto& pair : StId) {
             pair.second->info();
         }
@@ -132,30 +132,27 @@ public:
         return StId.find(id) != StId.end();
     }
 
+   
     bool saveToFile(const string& filename) const {
         ofstream file(filename);
         if (!file.is_open()) {
-            cout << "ERROR: file " << filename << " doesn't opening for writing" << endl;
+            cout << "ERROR: file " << filename << " doesn`t opening for writing" << endl;
             return false;
         }
-
-        // Сохраняем количество студентов и следующий ID
-        file << StId.size() << endl;
-        file << next << endl;
 
         for (const auto& pair : StId) {
             file << pair.second->str_to_file() << endl;
         }
 
         file.close();
-        cout << "Journal successfully saved to '" << filename << "'" << endl;
+        cout << "Journal successfuly added to '" << filename << "'" << endl;
         return true;
     }
 
     bool loadFromFile(const string& filename) {
         ifstream file(filename);
         if (!file.is_open()) {
-            cout << "ERROR: file " << filename << " doesn't opening for reading" << endl;
+            cout << "ERROR: file " << filename << " doesn`t opening for reading" << endl;
             return false;
         }
 
@@ -164,7 +161,7 @@ public:
 
         size_t count;
         file >> count;
-        
+
         file >> next;
         file.ignore();
 
@@ -177,7 +174,7 @@ public:
 
             Student student = Student::st_from_file(line);
 
-            auto studentPtr = make_shared<Student>(student.get_id(), student.get_name(), student.get_score());
+            shared_ptr<Student> studentPtr = make_shared<Student>(student.get_id(), student.get_name(), student.get_score());
 
             StId[student.get_id()] = studentPtr;
             StName[student.get_name()] = studentPtr;
@@ -192,7 +189,7 @@ public:
         }
 
         file.close();
-        cout << "Journal loaded from '" << filename << "' (" << StId.size() << " students)" << endl;
+        cout << "Journal is loaded from '" << filename << "' (" << StId.size() << " students)" << endl;
         return true;
     }
 };
@@ -204,88 +201,95 @@ void Menu(Journal& journal) {
     string filename;
 
     do {
-        cout << "\n=== Journal Menu ===" << endl;
+        cout << "\n=== Journal ===" << endl;
         cout << "1. Add Student" << endl;
         cout << "2. Set score by name" << endl;
         cout << "3. Set score by ID" << endl;
-        cout << "4. Get score by name" << endl;
+        cout << "4. Get score by nam" << endl;
         cout << "5. Get score by ID" << endl;
         cout << "6. Show Journal" << endl;
-        cout << "7. Save to file" << endl;
+        cout << "7. Export to file" << endl;
         cout << "8. Load from file" << endl;
         cout << "0. Exit" << endl;
         cout << "Select action: ";
         cin >> choice;
 
+
         switch (choice) {
+
         case 1: {
-            cout << "Enter student's name: ";
+            cout << "Put the student`s name: ";
             cin >> name;
-            cout << "Enter score: ";
+            cout << "Put the score: ";
             cin >> score;
             journal.add_St(name, score);
             break;
         }
+
         case 2: {
-            cout << "Enter student's name: ";
+            cout << "Put the student`s name: ";
             cin >> name;
-            cout << "Enter new score: ";
+            cout << "Put the new score: ";
             cin >> score;
             journal.change_score_byName(name, score);
             break;
         }
+
         case 3: {
-            cout << "Enter student's ID: ";
+            cout << "Put the student`s ID: ";
             cin >> id;
-            cout << "Enter new score: ";
+            cout << "Put the new score: ";
             cin >> score;
             journal.change_score_byID(id, score);
             break;
         }
+
         case 4: {
-            cout << "Enter student's name: ";
+            cout << "Put the student`s name:: ";
             cin >> name;
             score = journal.get_score_byName(name);
             if (score != -1)
-                cout << name << "'s score: " << score << endl;
+                cout << name << "`s score: " << score << endl;
             break;
         }
         case 5: {
-            cout << "Enter student's ID: ";
+            cout << "Put the student`s ID: ";
             cin >> id;
             score = journal.get_score_byID(id);
             if (score != -1)
-                cout << "Score of student with ID " << id << ": " << score << endl;
+                cout << "Score student bi ID " << id << ": " << score << endl;
             break;
         }
         case 6: {
             journal.print();
             break;
         }
+
         case 7: {
-            cout << "Enter filename to save: ";
+            cout << "Filename for saving to: ";
             cin >> filename;
             journal.saveToFile(filename);
             break;
         }
         case 8: {
-            cout << "Enter filename to load: ";
+            cout << "Filename for loading from: ";
             cin >> filename;
             journal.loadFromFile(filename);
             break;
         }
         case 0:
+        {
             break;
-        default:
-            cout << "Invalid choice!" << endl;
+        }
         }
     } while (choice != 0);
 
-    char answer;
+    int answer;
+    // Автоматическое сохранение при выходе
     cout << "Save data before exiting? (y/n): ";
     cin >> answer;
     if (answer == 'y' || answer == 'Y') {
-        cout << "Enter filename to save: ";
+        cout << "Filename for saving to: ";
         cin >> filename;
         journal.saveToFile(filename);
     }
@@ -293,6 +297,8 @@ void Menu(Journal& journal) {
 
 int main() {
     Journal journal;
+
     Menu(journal);
+
     return 0;
-}
+} 
